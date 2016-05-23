@@ -16,7 +16,7 @@ class Minesweeper(object):
     for i in board:
       print("")
       for x in i:
-        print(x),
+        print(x,end=" ")
     print(" ")
 
   def calcPoints(self,board):
@@ -43,8 +43,10 @@ class Minesweeper(object):
         return 10
       if wino==True:
         return -10
-    return 0
-  
+    if self.playsLeft(board)==0:
+      return 0
+    return None
+    
   def possibleMoves(self,board):
     moves=[]
     for row in range(0,3):
@@ -56,9 +58,10 @@ class Minesweeper(object):
   def goDeeper(self,board,player):
     sum = []
     sum.append(self.calcPoints(board))
-    #self.printFeld(board)
-    #print(self.calcPoints(board))
-    if self.playsLeft(board)>0 and self.calcPoints(board)==0:
+    if self.playsLeft(board) == 0:
+      self.printFeld(board)
+      print(self.calcPoints(board))
+    if self.playsLeft(board)>0 and self.calcPoints(board)==None:
       for move in self.possibleMoves(board):
         x = copy.deepcopy(board)
         if player == "X":
@@ -68,9 +71,9 @@ class Minesweeper(object):
           x[move[0]][move[1]]="O"
           sum.append(self.goDeeper(x,"X"))
     if player == "X":
-      return max(sum)
+      return max(x for x in sum if x is not None)
     if player == "O":
-      return min(sum)
+      return min(x for x in sum if x is not None)
   
   def evalMoves(self,board):
     scores =[]
@@ -81,25 +84,24 @@ class Minesweeper(object):
     return scores
   
   def makePlay(self): 
-    scores = self.evalMoves(lol.board)
+    scores = self.evalMoves(self.board)
     best = scores[scores.index(max(scores))][1]
-    #print(scores)
-    #print(best)
+    print(scores)
+    print(best)
     self.board[best[0]][best[1]]="X"
   
   def letsPlay(self):
-    self.printFeld(lol.board)
-    while self.playsLeft(lol.board)>0 and self.calcPoints(lol.board)==0:
-      coords = input('Player O, make play, like 0,2 ... ')
-      lol.board[coords[0]][coords[1]]="O"
+    self.printFeld(self.board)
+    while self.playsLeft(self.board)>0 and self.calcPoints(self.board)==None:
+      coords = eval(input('Player O, make play, like 0,2 ... '))
+      self.board[coords[0]][coords[1]]="O"
       print("You played:")
-      self.printFeld(lol.board)
-      if self.playsLeft(lol.board)>0 and self.calcPoints(lol.board)==0:
+      self.printFeld(self.board)
+      if self.playsLeft(self.board)>0 and self.calcPoints(self.board)==None:
         self.makePlay()
         print("CPU played:")
-        self.printFeld(lol.board)
+        self.printFeld(self.board)
     
-
 lol = Minesweeper()
 lol.letsPlay()
 
